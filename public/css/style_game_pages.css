@@ -1,0 +1,347 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+button, input[type="submit"], input[type="reset"] {
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+li {
+    list-style-type: none
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Roboto';
+}
+
+header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 54px;
+    background-color: #ECE5F0;
+    color: white;
+    display: flex;
+    align-items: center;
+    z-index: 696;
+}
+
+.padding-lr-15 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Skip the navigation bar, so stuff dont go under it */
+.skip-top-54 {
+    padding-top: 54px;
+}
+
+.hyperlink-text {
+    color: #424FAE;
+}
+
+.col-hor-center {
+    align-items: center;
+    text-align: center;
+}
+/* _______________________________________________________________________________
+
+                                NAVIGATION BAR STUFF
+__________________________________________________________________________________ */
+
+nav {
+    display: flex;
+    width: 100%;
+}
+
+nav>div {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+}
+
+nav h1 {
+    font-weight: 500;
+    color: black;
+    font-size: 24px;
+}
+
+nav svg {
+    height: 100%;
+    min-height: 25px;
+}
+
+.row-lmr-1 {
+    justify-content: flex-start;
+}
+
+
+.row-lmr-3 {
+    justify-content: flex-end;
+}
+
+
+
+/* _______________________________________________________________________________
+
+                                FOOTER STUFF
+__________________________________________________________________________________ */
+
+footer {
+    width: 100%;
+    background-color: #2D3047;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+footer div {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+footer div:first-child {
+    padding-top: 80px;
+}
+
+footer div:last-child {
+    padding-bottom: 80px;
+}
+
+footer a {
+    color:aqua;
+}
+
+/* _______________________________________________________________________________
+
+                        MAIN CONTENT STUFF FOR HOMEPAGE
+__________________________________________________________________________________ */
+.main-background {
+    background-color: #ECE5F0;
+}
+.main-content-wrapper {
+    margin: 0 auto;
+    max-width: 1100px;
+    min-height: 100vh;
+}
+
+.text-section {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    color: #2D3047;
+}
+
+.text-section h1 {
+    font-size: 32px;
+    font-weight: 500;
+}
+
+.text-section p {
+    font-size: 18px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-weight: 300;
+}
+
+/* _______________________________________________________________________________
+
+                                FORM STUFF
+__________________________________________________________________________________ */
+
+.col-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.col-section label {
+    display: block;
+    padding-bottom: 5px;
+}
+
+.form-text-input {
+    font-size: 16px;
+    padding-left: 10px;
+    margin-bottom: 20px;
+    background-color: transparent;
+    height: 50px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #2D3047;
+    border-radius: 20px;
+    outline: none;
+}
+
+.flex-container-center {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+#auth-alt div {
+    margin-top: 30px;
+}
+
+#auth-alt .hr-div {
+    width: 100%;
+    max-width: 300px;
+}
+
+#auth-alt .hr-div hr {
+    border: 0.5px solid #2D3047;
+}
+
+.form-submit-button {
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    background-color: #72AE2B;
+    height: 50px;
+    border-width: 0;
+    border-style: solid;
+    color: #ECE5F0;
+    border-radius: 15px;
+    outline: none;
+    font-family: 'Roboto';
+    font-weight: 500;
+    font-size: 22px;
+    max-width: 500px;
+    width: 100%;
+}
+
+#google-button {
+    border-width: 1px;
+    border-color: #2D3047;
+    border-radius: 15px;
+    border-style: solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    width: 100%;
+    max-width: 300px;
+}
+
+#google-button img {
+    width: 40px;
+    padding-right: 5px;
+}
+
+
+/* _______________________________________________________________________________
+
+                                GAME RECORDS
+__________________________________________________________________________________ */
+
+.game-record-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+    padding-bottom: 30px;
+}
+
+.game-record-top {
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url("../images/static/placeholder-map.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 15px 15px 0 0;
+}
+
+.game-active .game-record-top {
+    filter: brightness(0.6);
+}
+
+.game-record-top svg {
+    display: none;
+}
+
+.game-joined .game-record-top svg {
+    display: block;
+    width: 40px;
+}
+
+.game-record-bottom {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: fit-content;
+    background-color: #DFD8E2;
+    border-radius: 0 0 20px 20px;
+    padding: 20px 7px 20px 7px;
+}
+
+.game-record-players {
+    display: flex;
+    flex-direction: row;
+}
+
+.game-record-playercount {
+    padding-right: 5px;
+}
+
+.game-record-time {
+    display: flex;
+    flex-direction: row;
+    padding: 5px;
+    background-color: #2D3047;
+    color: white;
+    align-items: center;
+}
+
+.game-record-time-svg {
+    width: 12px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.game-record-time svg {
+    width: 100%;
+}
+
+.game-record-start {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 10px 0 10px 0;
+}
+
+.game-active .game-record-start {
+    padding-bottom: 7px;
+    padding-top: 7px;
+}
+
+.game-record-end {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 0 10px 0 10px;
+}
+
+.game-record-name {
+    font-size: 18px;
+}

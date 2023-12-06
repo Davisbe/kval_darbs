@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('kartesobjekts', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 20)->unique();
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->unsignedBigInteger('karte_id')->nullable();
+            $table->text('geojson');
             $table->timestamps();
+            $table->foreign('karte_id')->references('id')->on('kartes')->cascadeOnDelete();
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('kartesobjekts');
     }
 };

@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('kartes', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 20)->unique();
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
+            $table->string('name', 255)->charset('utf8mb4')->collation('utf8mb4_unicode_ci')->nullable();
+            $table->decimal('viduspunkts_garums', 9, 6);
+            $table->decimal('viduspunkts_platums', 8, 6);
+            $table->unsignedInteger('zoom');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('kartes');
     }
 };
