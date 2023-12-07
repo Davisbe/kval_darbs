@@ -6,18 +6,106 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
+
+use Exception;
 
 class AuthGoogle extends Controller
 {
-    function show_register () {
-
+    function redirect () {
+        if (Auth::check()) {
+            return back();
+        }
+        return Socialite::driver('google')->redirect();
     }
 
-    function show_login () {
+    function callback (Request $request) {
+        if (Auth::check()) {
+            return back();
+        }
 
+        try {
+            // get user data from Google
+            $user = Socialite::driver('google')->user();
+
+            // find user in the database where the social id is the same with the id provided by Google
+            $finduser = User::where('google_oauth', $user->id)->first();
+
+            if ($finduser)  // if user found then do this
+            {
+                // Log the user in
+                Auth::login($finduser);
+                $request->session()->regenerate();
+
+                return redirect()->route('games_index');
+            }
+            else
+            {
+                // if user not found then this is the first time he/she try to login with Google account
+                
+                // store needed google info in session, because unique username needs to be created
+                session(['temp_google_user' => [
+                    'email' => $user->email,
+                    'google_oauth' => $user->id,
+                ]]);
+
+                return redirect()->route('auth.create_name_index');
+            }
+
+        }
+        catch (Exception $e)
+        {  
+            // !!! remove in production
+            dd($e);
+        }
     }
 
-    function save () {
+    function create_name_index() {
+        if (Auth::check()) {
+            return redirect()->route('games_index');
+        }
+        else if (! session()->has('temp_google_user')) {
+            return redirect()->route('homepage_index');
+        }
 
+        return view('auth/create-name');
     }
+
+    function create_name_check(Request $request) {
+        if (Auth::check()) {
+            return redirect()->route('games_index');
+        }
+        else if (! session()->has('temp_google_user')) {
+            return redirect()->route('homepage_index');
+        }
+
+        $request->validate([
+            'username_r'=>'required|min:3|max:20|alpha_dash:ascii|unique:users,name',
+        ]);
+
+        // generate a random password, becasue an OAuth user won't use one
+        $random_password = Str::random(50);
+
+        $session_google_user = session('temp_google_user');
+
+        $user = new User;
+        $user->name = $request->username_r;
+        $user->email = $session_google_user['email'];
+        $user->google_oauth = $session_google_user['google_oauth'];
+        $user->password = Hash::make($random_password);
+        $user->markEmailAsVerified(); // email is verified since google was used to log in
+        $save = $user->save();
+
+        if ($save) {
+            if (Auth::login($user)) {
+                $request->session()->regenerate();
+            }
+            return redirect()->route('games_index');
+        }
+        else {
+            return back()->with('fail','Kaut kas nogāja greizi. Pamēģini vēlreiz mazliet vēlāk.');
+        }
+    }
+
 }

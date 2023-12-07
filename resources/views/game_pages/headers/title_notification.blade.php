@@ -1,6 +1,6 @@
 <header class="padding-lr-15">
     <nav>
-        <div class="row-lmr-1"></div>
+        <div class="row-lmr-1"><a href="{{ route('auth.logout') }}">Atteikties</a></div>
         <div class="row-lmr-2">
             <div>
                 <h1>@yield('header_title')</h1>

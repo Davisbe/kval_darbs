@@ -73,7 +73,7 @@
             Jau esi reģistrējies? <a href="{{ route('login') }}"><span class="hyperlink-text">Pieteikties šeit</span></a>
         </div>
         <div class="flex-container-center">
-            <button id="google-button"><img src="{{ asset('images/static/google-logo.png') }}" alt="Google logo"> Reģistrēties ar Google</button>
+            <button id="google-button" onclick="window.location.href='{{ route('auth.google.redirect') }}'"><img src="{{ asset('images/static/google-logo.png') }}" alt="Google logo"> Reģistrēties ar Google</button>
         </div>
     </div>
 

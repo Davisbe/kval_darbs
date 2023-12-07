@@ -132,6 +132,7 @@ class Authentification extends Controller
         if(Auth::check()) {
             Auth::logout();
         }
+        
         return redirect()->route('login');
     }
 
