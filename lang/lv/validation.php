@@ -188,6 +188,10 @@ return [
             'required' => 'Ievadiet Paroli atkārtoti',
             'same' => 'Šim laukam jāsakrīt ar paroles lauku',
             'string' => 'Parolei jābūt simbolu virknei'
+        ],
+        'password_r_old' => [
+            'required' => 'Lai nomainītu paroli vai e-pastu, jāievada tagadējā parole',
+            'string' => 'Parolei jābūt simbolu virknei'
         ]
         ],
 

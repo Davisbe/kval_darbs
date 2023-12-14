@@ -5,7 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Authentification;
 use App\Http\Controllers\AuthGoogle;
 use App\Http\Controllers\Homepage;
+use App\Http\Controllers\UserProfile;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +21,13 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// !!! debug database logs
+Event::listen('Illuminate\Database\Events\QueryExecuted', function ($query) {
+    Log::info( json_encode($query->sql) );
+    Log::info( json_encode($query->bindings) );
+    Log::info( json_encode($query->time)   );
+});
 
 Route::get('/', [Homepage::class, 'index'])->name('homepage_index');
 
@@ -33,12 +44,31 @@ Route::get('/auth/google/redirect', [AuthGoogle::class, 'redirect'])->name('auth
 Route::get('/auth/google/create-name', [AuthGoogle::class, 'create_name_index'])->name('auth.create_name_index');
 Route::post('/auth/google/name/check', [AuthGoogle::class, 'create_name_check'])->name('auth.create_name_check');
 
-Route::get('/games', function () {
-    return view('game_pages/games_index');
-})->name('games_index')->middleware(['auth', 'verified']);
+// Middleware group for authenticated users with verified emails
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/games', function () {
+        return view('game_pages/games_index');
+    })->name('games_index');
+
+    Route::get('/user/{name}', [UserProfile::class, 'show'])->name('profile.show');
+    Route::get('/user/{name}/edit', [UserProfile::class, 'edit'])->name('profile.edit');
+    Route::post('/user/{name}/update', [UserProfile::class, 'update'])->name('profile.update');
+
+    Route::get('/search/users', [UserProfile::class, 'search_users'])->name('users.search');
+    Route::get('/search/return', [UserProfile::class, 'return_users'])->name('users.return');
+
+    Route::get('/friends', [UserProfile::class, 'friend_list'])->name('friend.list');
+    Route::post('/friends/remove/{name}', [UserProfile::class, 'friend_remove'])->name('friend.remove');
+
+    Route::get('/notifications', [UserProfile::class, 'notifications'])->name('notifications');
+    Route::post('/friend/request/send/{name}', [UserProfile::class, 'sendFriendRequest'])->name('friend.request.send');
+    Route::post('/friends/request/accept/{name}', [UserProfile::class, 'friend_request_accept'])->name('friend.request.accept');
+    Route::post('/friends/request/deny/{name}', [UserProfile::class, 'friend_request_deny'])->name('friend.request.deny');
+
+});
 
 /*
-
 Email verification routes
 */
 
@@ -55,5 +85,5 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
  
-    return back()->with('message', 'Verifikācijas saite nosūtīta!');
+    return back()->with('success', 'Verifikācijas saite nosūtīta!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');

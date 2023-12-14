@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -42,7 +43,14 @@ class AuthGoogle extends Controller
             }
             else
             {
-                // if user not found then this is the first time he/she try to login with Google account
+                // if user is found with this gmail address, but oauth wasn't used, then
+                // prompt user with the appropriate message
+                $finduser_with_email = User::where('email', $user->email)->where('google_oauth', null)->first();
+                if ($finduser_with_email) {
+                    return redirect()->route('login')->with('fail', 'Tev jāpiesakās, ievadot e-pastu un paroli');
+                }
+
+                // if user not found then this is the first time they try to login with Google account
                 
                 // store needed google info in session, because unique username needs to be created
                 session(['temp_google_user' => [
@@ -56,8 +64,7 @@ class AuthGoogle extends Controller
         }
         catch (Exception $e)
         {  
-            // !!! remove in production
-            dd($e);
+            return redirect()->route('login')->with('fail', 'Kaut kas nogāja greizi. Pamēģini vēlreiz mazliet vēlāk.');
         }
     }
 
@@ -94,10 +101,16 @@ class AuthGoogle extends Controller
         $user->email = $session_google_user['email'];
         $user->google_oauth = $session_google_user['google_oauth'];
         $user->password = Hash::make($random_password);
+        $user->profile_picture = 'storage/images/static/profile-pic-placeholder.png';
         $user->markEmailAsVerified(); // email is verified since google was used to log in
         $save = $user->save();
 
         if ($save) {
+            // create role row for user in "roles" table
+            $user_role = Role::create([
+                'user_id' => $user->id
+            ]);
+            $user_role->save();
             if (Auth::login($user)) {
                 $request->session()->regenerate();
             }

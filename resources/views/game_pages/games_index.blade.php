@@ -6,6 +6,10 @@
     @section('header_title', 'Spēles')
 @endsection
 
+@section('bottom-nav')
+    @extends('game_pages.bottom_navs.sett_games_profile')
+@endsection
+
 @section('content')
     <div class="padding-lr-15">
         <div class="game-record-container game-active game-joined">
@@ -15,7 +19,6 @@
                     <x-svg.group_icon />
                 </div>
             </div>
-
             <div class="game-record-time game-record-end">
                 <div>
                     21/01/2024
@@ -56,7 +59,6 @@
                 </div>
             </div>
         </div>
-
         
     </div>
 @endsection

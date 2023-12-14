@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Auth\Events\Registered;
+
 
 class Authentification extends Controller
 {
@@ -80,6 +82,7 @@ class Authentification extends Controller
         $user->name = $request->username_r;
         $user->email = $request->email_r;
         $user->password = Hash::make($request->password_r);
+        $user->profile_picture = 'storage/images/static/profile-pic-placeholder.png';
         $save = $user->save();
 
         $credentials = [
@@ -88,7 +91,14 @@ class Authentification extends Controller
         ];
 
         if ($save) {
+            // used to send email verification link
             event(new Registered($user));
+            // create role row for user in "roles" table
+            $user_role = Role::create([
+                'user_id' => $user->id
+            ]);
+            $user_role->save();
+            // log in user, so they can verify their email in the same session
             if (Auth::attempt($credentials)) {
                 $request->session()->regenerate();
             }
