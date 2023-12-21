@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="lv">
     <head>
         <title>@yield('title')</title>

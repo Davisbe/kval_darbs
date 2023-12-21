@@ -1,15 +1,6 @@
 @extends('game_pages.master')
 @section('title', 'MAUC - Draugu saraksts')
-
-@section('header')
-    @extends('game_pages.headers.title_notification')
-    @section('header_title', 'Draugi')
-@endsection
-
-@section('bottom-nav')
-    @extends('game_pages.bottom_navs.sett_games_profile')
-@endsection
-
+@section('header_title', 'Draugi')
 @section('content')
     <div id="confirmation-window" class="confirmation-window">
         <div id="confirmation-window-content" class="confirmation-window-content col-section">

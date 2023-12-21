@@ -1,15 +1,6 @@
 @extends('game_pages.master')
 @section('title', 'MAUC - Notifikācijas')
-
-@section('header')
-    @extends('game_pages.headers.title_notification')
-    @section('header_title', 'Notifikācijas')
-@endsection
-
-@section('bottom-nav')
-    @extends('game_pages.bottom_navs.sett_games_profile')
-@endsection
-
+@section('header_title', 'Notifikācijas')
 @section('content')
         
     <div class="col-section padding-lr-15">

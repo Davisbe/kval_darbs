@@ -77,7 +77,7 @@ class UserProfile extends Controller
             if ($request->file('profile-picture')->isValid()) {
                 $imageName = time().'.'.$name.'.'.'256x256'.'.jpg';
                 $image_resize = ImageManager::gd()->read($request->file('profile-picture'));
-                $image_resize = $image_resize->coverDown(256, 256)->toJpeg(100)->__toString();
+                $image_resize = $image_resize->coverDown(256, 256)->toJpeg(75)->__toString();
                 if (Storage::put('public/images/profile_pictures/'.$imageName, $image_resize, 'public')) {
                     if ($user->profile_picture != 'storage/images/static/profile-pic-placeholder.png') {
                         Storage::delete(str_replace('storage/', 'public/', $user->profile_picture));
@@ -119,16 +119,18 @@ class UserProfile extends Controller
         if ($request->filled('username_r')) {
             $user->name = $request->input('username_r');
         }
-        if ($request->filled('password_r')) {
-            $user->password = Hash::make($request->input('password_r'));
+        if (is_null($user->google_oauth)) {
+            if ($request->filled('password_r')) {
+                $user->password = Hash::make($request->input('password_r'));
+            }
+            if ($request->filled('email_r')) {
+                $user->old_email = $user->email;
+                $user->email = $request->input('email_r');
+                $user->email_verified_at = null;
+                $user->sendEmailVerificationNotification();
+            }
         }
-        if ($request->filled('email_r')) {
-            $user->old_email = $user->email;
-            $user->email = $request->input('email_r');
-            $user->email_verified_at = null;
-            $user->sendEmailVerificationNotification();
-        }
-
+        
         $user->save();
         return redirect()->route('profile.edit', ['name' => $user->name,])->with('success','Profils rediģēts!');
 
@@ -151,6 +153,7 @@ class UserProfile extends Controller
     
         $data = User::where('name', 'LIKE', '%' . $query . '%')
                     ->whereNotNull('email_verified_at')
+                    ->where('name', '!=', Auth::user()->name)
                     ->select(['name', 'profile_picture'])
                     ->limit(10)
                     ->get();

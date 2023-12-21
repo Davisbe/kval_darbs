@@ -1,4 +1,5 @@
 <h1>Pirms palaišanas produkcijā, apskatīt komentārus ar "!!!" prefiksu</h1>
+<p> Ā jā, vajadzēs arī pārbaudīt, lai priekš PHP ir GD - https://github.com/Intervention/image?tab=readme-ov-file#:~:text=Supported%20Image%20Libraries-,GD%20Library,-Imagick%20PHP%20extension </p>
 <h1>Citi soļi produkcijai:</h1>
 <ul>
     <li>Noņem debug:

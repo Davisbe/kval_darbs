@@ -6,6 +6,7 @@ use App\Http\Controllers\Authentification;
 use App\Http\Controllers\AuthGoogle;
 use App\Http\Controllers\Homepage;
 use App\Http\Controllers\UserProfile;
+use App\Http\Controllers\GamesInfo;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 use Illuminate\Support\Facades\Event;
@@ -47,9 +48,10 @@ Route::post('/auth/google/name/check', [AuthGoogle::class, 'create_name_check'])
 // Middleware group for authenticated users with verified emails
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/games', function () {
-        return view('game_pages/games_index');
-    })->name('games_index');
+    Route::get('/games', [GamesInfo::class, 'index'])->name('games_index');
+    Route::get('/games/loadmore', [GamesInfo::class, 'index_load_games'])->name('games_index.loadmore');
+    Route::get('/games/{id}', [GamesInfo::class, 'show'])->name('game.show');
+    Route::post('/games/test', [GamesInfo::class, 'test'])->name('game.test');
 
     Route::get('/user/{name}', [UserProfile::class, 'show'])->name('profile.show');
     Route::get('/user/{name}/edit', [UserProfile::class, 'edit'])->name('profile.edit');
@@ -71,19 +73,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 /*
 Email verification routes
 */
+Route::middleware(['auth'])->group(function () {
 
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+    Route::get('/email/verify', function () {
+        return view('auth.verify-email');
+    })->name('verification.notice');
+    
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+     
+        return redirect()->route('games_index');
+    })->middleware(['signed'])->name('verification.verify');
+    
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+     
+        return back()->with('success', 'Verifikācijas saite nosūtīta!');
+    })->middleware(['throttle:6,1'])->name('verification.send');
 
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
- 
-    return redirect()->route('games_index');
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
- 
-    return back()->with('success', 'Verifikācijas saite nosūtīta!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+});

@@ -1,15 +1,6 @@
 @extends('game_pages.master')
 @section('title', 'MAUC - Meklēt lietotājus')
-
-@section('header')
-    @extends('game_pages.headers.title_notification')
-    @section('header_title', 'Meklēt lietotājus')
-@endsection
-
-@section('bottom-nav')
-    @extends('game_pages.bottom_navs.sett_games_profile')
-@endsection
-
+@section('header_title', 'Meklēt lietotājus')
 @section('content')
     <div class="padding-lr-15 col-section">
         <div class="col-section">

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use Illuminate\Support\Facades\DB;
+
 class Spele extends Model
 {
     use HasFactory;
@@ -37,6 +39,12 @@ class Spele extends Model
     public function sazina():HasMany {
         return $this->hasMany(Sazina::class);
     }
+
+    // get all games that are not ended, also figure out how many players have joined to each game (i.e. how many players are connected to the groups which are conencted to the game)
+    public static function getAvailableGames() {
+        
+    }
+
 
 
 }

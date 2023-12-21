@@ -1,15 +1,6 @@
 @extends('game_pages.master')
 @section('title', 'MAUC - '.$userinfo->name)
-
-@section('header')
-    @extends('game_pages.headers.title_notification')
-    @section('header_title', $userinfo->name)'
-@endsection
-
-@section('bottom-nav')
-    @extends('game_pages.bottom_navs.sett_games_profile')
-@endsection
-
+@section('header_title', $userinfo->name)
 @section('content')
     <div class="padding-lr-15 col-section">
         <div class="row-section profile-card">
@@ -40,7 +31,7 @@
             </div>
         </div>
 
-        <div class="row-section col-hor-center profile-button-row">
+        <div id="profile-button-row" class="row-section col-hor-center profile-button-row">
             @if ($userinfo->name == @Auth::user()->name)
             <button onclick="window.location.href='{{ route('profile.edit', ['name' => $userinfo->name,]) }}'">
                 <div>

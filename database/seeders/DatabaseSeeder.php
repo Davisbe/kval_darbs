@@ -44,9 +44,19 @@ class DatabaseSeeder extends Seeder
             'name' => 'testuser',
             'email' => 'test@test',
             'password' => Hash::make('qwerty12345'),
+            'profile_picture' => 'storage/images/static/profile-pic-placeholder.png',
         ]);
         $testing_user->markEmailAsVerified();
         $testing_user->save();
+
+        $testing_user2 = User::create([
+            'name' => 'testuser2',
+            'email' => 'test2@test',
+            'password' => Hash::make('qwerty12345'),
+            'profile_picture' => 'storage/images/static/profile-pic-placeholder.png',
+        ]);
+        $testing_user2->markEmailAsVerified();
+        $testing_user2->save();
 
         $karte = Karte::create([
             'name' => 'Jūrmala',
@@ -60,7 +70,7 @@ class DatabaseSeeder extends Seeder
             'karte_id' => $karte->id,
             'name' => 'Jūrmalas brīnišķīgā spēle',
             'description' => 'Jūrmalas spēle',
-            'picture' => 'images/static/profile-pic-placeholder.png',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
             'start_time' => Carbon::parse('2021-05-01 00:00:00'),
             'end_time' => Carbon::parse('2021-05-31 23:59:59'),
         ]);
@@ -70,7 +80,7 @@ class DatabaseSeeder extends Seeder
             'karte_id' => $karte->id,
             'name' => 'Jūrmalas brīnišķīgā spēle 2',
             'description' => 'Jūrmalas spēle 2',
-            'picture' => 'images/static/profile-pic-placeholder.png',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
             'start_time' => Carbon::parse('2021-05-01 00:00:00'),
             'end_time' => Carbon::parse('2021-05-31 23:59:59'),
         ]);
@@ -80,7 +90,7 @@ class DatabaseSeeder extends Seeder
             'karte_id' => $karte->id,
             'name' => 'Jūrmalas brīnišķīgā spēle 3',
             'description' => 'Jūrmalas spēle 3',
-            'picture' => 'images/static/profile-pic-placeholder.png',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
             'start_time' => Carbon::parse('2021-06-01 00:00:00'),
             'end_time' => Carbon::parse('2021-06-31 23:59:59'),
         ]);
@@ -90,7 +100,7 @@ class DatabaseSeeder extends Seeder
             'karte_id' => $karte->id,
             'name' => 'Jūrmalas brīnišķīgā spēle 4',
             'description' => 'Jūrmalas spēle 4',
-            'picture' => 'images/static/profile-pic-placeholder.png',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
             'start_time' => Carbon::parse('2024-06-01 00:00:00'),
             'end_time' => Carbon::parse('2024-06-31 23:59:59'),
         ]);
@@ -100,11 +110,65 @@ class DatabaseSeeder extends Seeder
             'karte_id' => $karte->id,
             'name' => 'Jūrmalas brīnišķīgā spēle 5',
             'description' => 'Jūrmalas spēle 5',
-            'picture' => 'images/static/profile-pic-placeholder.png',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
             'start_time' => Carbon::parse('2023-12-09 00:00:00'),
             'end_time' => Carbon::parse('2023-12-10 23:59:59'),
         ]);
         $spele5->save();
+
+        $spele6 = Spele::create([
+            'karte_id' => $karte->id,
+            'name' => 'Jūrmalas brīnišķīgā spēle 6',
+            'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
+            'start_time' => Carbon::parse('2023-12-21 00:00:00'),
+            'end_time' => Carbon::parse('2023-12-21 23:59:59'),
+        ]);
+        $spele6->save();
+
+        $spele7 = Spele::create([
+            'karte_id' => $karte->id,
+            'name' => 'Jūrmalas brīnišķīgā spēle 7',
+            'description' => 'Šis ir labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs .',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
+            'start_time' => Carbon::parse('2023-12-21 00:00:00'),
+            'end_time' => Carbon::parse('2023-12-21 23:59:59'),
+        ]);
+        $spele7->save();
+
+        $spele8 = Spele::create([
+            'karte_id' => $karte->id,
+            'name' => 'Jūrmalas brīnišķīgā spēle 8',
+            'description' => 'Šis ir labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs .',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
+            'start_time' => Carbon::parse('2023-12-18 00:00:00'),
+            'end_time' => Carbon::parse('2023-12-19 02:00:00'),
+        ]);
+        $spele8->save();
+
+        $spele9 = Spele::create([
+            'karte_id' => $karte->id,
+            'name' => 'Jūrmalas brīnišķīgā spēle 712',
+            'description' => 'Šis ir labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs labs .',
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
+            'start_time' => Carbon::parse('2023-12-01 00:00:00'),
+            'end_time' => Carbon::parse('2023-12-30 02:00:00'),
+        ]);
+        $spele9->save();
+
+        for ($i = 0; $i < 40; $i++) {
+            $spele = Spele::create([
+                'karte_id' => $karte->id,
+                'name' => 'Jūrmalas brīnišķīgā spēle ' . $i,
+                'description' => 'Šis ir labs labs labs labs labs labs labs',
+                'picture' => 'storage/images/static/profile-pic-placeholder.png',
+                'start_time' => Carbon::parse('2024-12-18 00:00:00'),
+                'end_time' => Carbon::parse('2024-12-19 02:00:00'),
+            ]);
+            $spele->save();
+        }
+
+        
 
         $grupa1 = Grupa::create([
             'spele_id' => $spele1->id
@@ -157,7 +221,14 @@ class DatabaseSeeder extends Seeder
             'grupa_id' => $grupa4->id,
             'uzaicinats' => 0,
             'apstiprinats' => 1,
-            'active' => 1,
+            'active' => 0,
+        ]);
+        $lietotajs2grupa4 = DB::table('lietotajsgrupa')->insert([
+            'user_id' => $testing_user2->id,
+            'grupa_id' => $grupa4->id,
+            'uzaicinats' => 1,
+            'apstiprinats' => -1,
+            'active' => 0,
         ]);
         $lietotajsgrupa5 = DB::table('lietotajsgrupa')->insert([
             'user_id' => $testing_user->id,

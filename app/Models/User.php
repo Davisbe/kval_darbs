@@ -107,6 +107,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->friendsOfMine()->where('user2_id', $otherUser->id)->where('denied', 1)->exists();
     }
 
+    // get all incoming friend requests to the current user
     public function incomingFriendRequests()
     {
         return $this->friendOf()->where('denied', 0)->whereNotIn('user1_id', $this->friendsOfMine()->pluck('user2_id'))->get();
@@ -165,7 +166,29 @@ class User extends Authenticatable implements MustVerifyEmail
 
     }
     
+    // get all group invites to games that user has recieved
+    public function groupInvites()
+    {
+        return $this->grupa()->wherePivot('uzaicinats', 1)
+            ->wherePivot('apstiprinats', -1)
+            ->orderBy('created_at', 'asc')
+            ->get();
+    }
 
+    // get all group invites to a specific game, that user has recieved
+    public function groupInvitesToGame($game_id)
+    {
+        return $this->grupa()->wherePivot('uzaicinats', 1)
+            ->where('spele_id', $game_id)
+            ->wherePivot('apstiprinats', -1)
+            ->leftJoin('lietotajsgrupa as lietotajsgrupa2', 'lietotajsgrupa2.grupa_id', '=', 'grupas.id')
+            ->leftJoin('users as inviter', 'inviter.id', '=', 'lietotajsgrupa2.user_id')
+            ->where('inviter.id', '!=', $this->id)
+            ->where('lietotajsgrupa2.uzaicinats', 0)
+            ->select('grupas.id', 'inviter.name as inviter_name', 'grupas.created_at')
+            ->orderBy('created_at', 'asc')
+            ->get();
+    }
 
 
 }

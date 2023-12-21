@@ -1,15 +1,6 @@
 @extends('game_pages.master')
 @section('title', 'MAUC - rediģēt profilu')
-
-@section('header')
-    @extends('game_pages.headers.title_notification')
-    @section('header_title', $userinfo->name)'
-@endsection
-
-@section('bottom-nav')
-    @extends('game_pages.bottom_navs.sett_games_profile')
-@endsection
-
+@section('header_title', $userinfo->name)
 @section('content')
 <form enctype="multipart/form-data" id="updateProfileForm" accept-charset="utf-8" action="{{ route('profile.update', ['name' => $userinfo->name]) }}" method="post">
 @csrf
@@ -160,5 +151,6 @@
 
     <script type="text/javascript">
         var MESSAGE_PROFILE_PICTURE_EDIT_PROCESSING = "{{ __('Uzgaidi..') }}";
+        var MESSAGE_PROFILE_PICTURE_EDIT_ERROR = "{{ __('Izvēlies citu foto') }}";
     </script>
 @endsection

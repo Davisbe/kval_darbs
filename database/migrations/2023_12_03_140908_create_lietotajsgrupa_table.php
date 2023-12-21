@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->primary(['grupa_id', 'user_id']);
             $table->boolean('uzaicinats')->default(1);
-            $table->boolean('apstiprinats')->default(0);
+            $table->boolean('apstiprinats')->default(-1);
             $table->boolean('active')->default(0);
             $table->timestamps();
             $table->foreign('grupa_id')->references('id')->on('grupas')->cascadeOnDelete();
