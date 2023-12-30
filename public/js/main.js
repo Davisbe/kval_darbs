@@ -11,6 +11,7 @@ function convertUTCDateToLocalDate(date) {
     return newDate;
 }
 
+// For converting js Date object to HH:MM format
 function DateToHHMM(date) {
     datetext = date.toTimeString();
     datetext = datetext.split(' ')[0];
@@ -19,6 +20,7 @@ function DateToHHMM(date) {
     return datetext;
 }
 
+// For converting js Date object to DD/MM/YYYY format
 function DateToDDMMYYYY(date) {
     datetext = date.toLocaleString('en-GB', {
         hour12: false,
@@ -27,6 +29,7 @@ function DateToDDMMYYYY(date) {
     return datetext;
 }
 
+// For converting js Date object to DD/MM format
 function DateToDDMM(date) {
     datetext = date.toLocaleString('en-GB', {
         hour12: false,
@@ -38,6 +41,7 @@ function DateToDDMM(date) {
 }
 
 // Function for closing/opening the sidebar navigation menu
+// on the home page, login page, register page, etc.
 function toggleShelf() {
   const shelf = document.getElementById("shelf-wrapper")
   shelf.classList.toggle("shelf-wrapper-closed")
@@ -125,7 +129,7 @@ function sendFriendRequest() {
             button.disabled = true;
             if (response.accepted_fiend) {
                 div.textContent = MESSAGE_FRIEND_REQUEST_ACCEPTED;
-                // Wait for 3 seconds
+                // Wait for 4 seconds
                 setTimeout(function() {
                     // Hide the button
                     div.classList.add('closed');
@@ -133,7 +137,7 @@ function sendFriendRequest() {
                 }, 4000);
             } else if (response.request_already_sent) {
                 div.textContent = MESSAGE_FRIEND_REQUEST_ALREADY_SENT;
-                // Wait for 3 seconds
+                // Wait for 4 seconds
                 setTimeout(function() {
                     // Hide the button
                     div.classList.add('closed');
@@ -141,7 +145,7 @@ function sendFriendRequest() {
                 }, 4000);
             } else if (response.success) {
                 div.textContent = MESSAGE_FRIEND_REQUEST_SENT;
-                // Wait for 3 seconds
+                // Wait for 4 seconds
                 setTimeout(function() {
                     // Hide the button
                     div.classList.add('closed');
@@ -151,7 +155,7 @@ function sendFriendRequest() {
             else {
                 div.classList.add('error');
                 div.textContent = MESSAGE_FRIEND_REQUEST_ERROR;
-                // Wait for 3 seconds
+                // Wait for 4 seconds
                 setTimeout(function() {
                     // Hide the button
                     div.classList.add('closed');
@@ -464,22 +468,246 @@ if (game_show_end_time) {
 // }
   
 // function sendLocation(position) {
-//     var latitude = position.coords.latitude;
-//     var longitude = position.coords.longitude;
-//     console.log(latitude+', '+longitude);
+    // var latitude = position.coords.latitude;
+    // var longitude = position.coords.longitude;
+    // console.log(latitude+', '+longitude);
 
-//     $.ajax({
-//         url: "https://mauclocal.lv/games/test",
-//         type: "POST",
-//         data: {
-//         latitude: latitude,
-//         longitude: longitude,
-//         },
-//         success: function (response) {
-//             console.log(response);
-//         },
-//         error: function (response) {
-//             alert("Error: " + response.responseText);
-//         },
-//     });
+    // $.ajax({
+    //     url: "https://mauclocal.lv/games/test",
+    //     type: "POST",
+    //     data: {
+    //     latitude: latitude,
+    //     longitude: longitude,
+    //     },
+    //     success: function (response) {
+    //         console.log(response);
+    //     },
+    //     error: function (response) {
+    //         alert("Error: " + response.responseText);
+    //     },
+    // });
 // }
+
+/*
+
+    GROUP MEMBER PAGE BEFORE GAME START
+    Manage users, mark user as ready button, etc.
+
+*/
+
+function removeGroupMember(name) {
+    var friend_reqest_div = document.querySelector(`div[group_member_name="${name}"]`);
+    // Send AJAX request
+    $.ajax({
+        url: REMOVE_GROUP_MEMBER_URL.replace("%24", name),
+        method: 'POST',
+        success: function(response) {
+            if (response.success) {
+                friend_reqest_div.remove();
+            }
+        },
+    });
+}
+
+function inviteFriendToGroup(name) {
+    // Change div's color and text
+    var friend_reqest_div = document.querySelector(`div[friend_name="${name}"]`);
+    var invite_button = document.getElementById('friend-group-invite-button');
+    // Send AJAX request
+    $.ajax({
+        url: INVITE_FRIEND_TO_GROUP_URL.replace("%24", name),
+        method: 'POST',
+        success: function(response) {
+            if (response.success) {
+                invite_button.textContent = INVITE_FRIEND_TO_GROUP_SENT_MESSAGE;
+                friend_reqest_div.classList.add('invited-to-group-clicked');
+
+                // Wait for 3 seconds
+                setTimeout(function() {
+                    // Hide the button
+                    friend_reqest_div.remove();
+                }, 4000);
+            }
+        },
+    });
+}
+
+// Function for adding a timer until the game starts on the button
+// that the user would press to mark themselves as ready
+// to start the game
+var group_member_ready_button = document.getElementById('group-member-ready-button');
+var group_member_ready_eligible = false; // check if timer reached 0
+
+// AJAX polls for getting group member ready status
+// as well as adding/removing users from the group
+pollGroupMemberReady = () => {
+    $.ajax({
+        url: GAME_GROUP_POLL_GAME_READY_URL,
+        method: 'GET',
+        success: function(response) {
+            // redirect to active game page if game started
+            if (response.redirect_link_allready) {
+                window.location.href = response.redirect_link_allready;
+                clearInterval(pollGroupMemberReady)
+                return;
+            }
+
+            // redirect to game info page if user kicked from group
+            if (response.redirect_link_kicked) {
+                window.location.href = response.redirect_link_kicked;
+                clearInterval(pollGroupMemberReady)
+                return;
+            }
+
+            if (response.success) {
+
+                var new_member_count = response.group_members.length;
+                var current_members = document.querySelectorAll('div[group_member_name]');
+                
+                response.group_members.forEach(member => {
+                    // update the ready status of the users
+                    var member_div = document.querySelector(`div[group_member_name="${member.name}"]`);
+                    if (member_div) {
+                        if (member.active == 0) {
+                            member_div.classList.add('ready');
+                        } else {
+                            member_div.classList.remove('ready');
+                        }
+                    }
+                    
+                });
+
+                // update the current members array \/
+
+                // put all updated member names into an array for comparison with current members
+                var new_member_name_array = [];
+                for (let i = 0; i < new_member_count; i++) {
+                    new_member_name_array.push(response.group_members[i].name);
+                }
+
+                // remove any users that are no longer in the group
+                for (let i = 0; i < current_members.length; i++) {
+                    if (!new_member_name_array.includes(current_members[i].getAttribute('group_member_name'))) {
+                        current_members[i].remove();
+                    }
+                }
+
+                // add any new users that have joined the group
+                response.group_members.forEach(member => {
+                    var member_div = document.querySelector(`div[group_member_name="${member.name}"]`);
+                    if (!member_div) {
+                        var member_div = document.createElement('div');
+                        member_div.classList.add('friend-result');
+                        member_div.classList.add('row-section');
+                        if (member.active == 0) {
+                            member_div.classList.add('ready');
+                        }
+                        member_div.setAttribute('group_member_name', member.name);
+
+                        member_div.innerHTML = ``;
+                        // store the html in variable otherwise .innerHTML will add div endings automatically
+                        member_div_stuff = `
+                        <div class="friend-info">
+                            <div class="friend-result-image">
+                                <img src="${member.profile_picture}" alt="Profile Picture">
+                            </div>
+                            <div class="friend-result-text">
+                                <a href="${member.profile_link}">${member.name}</a>
+                            </div>`
+                            if (member.uzaicinats == 0) {
+                                member_div_stuff +=
+                                `<div class="group-member-owner-icon">
+                                    ${GAME_GROUP_LEADER_SVG}
+                                </div>`
+                            }
+                            member_div_stuff +=
+                            `<div class="group-member-ready-icon">
+                                ${GAME_GROUP_READY_SVG}
+                            </div>
+                        </div>
+                        <div class="friend-actions">`
+                            if ((member.name != GAME_GROUP_AUTHED_USER) && (GAME_GROUP_IS_USER_LEADER)) {
+                                member_div_stuff +=
+                                `<div class="remove-friend">
+                                    <button onclick="removeGroupMember( '${member.name}' )">
+                                        Izmest
+                                    </button>
+                                </div>`
+                            }
+                        member_div_stuff +=
+                        `</div>
+                        `;
+                        member_div.innerHTML = member_div_stuff;
+                        document.getElementById('game-group-member-list').append(member_div);
+                    }
+                });
+
+            }
+        },
+    });
+}
+
+function timeUntilGameStart() {
+    var start_time = convertUTCDateToLocalDate(GAME_GROUP_START_TIME).getTime();
+    
+    // Update the count down every 1 second
+    var x = setInterval(function() {
+
+        // Get today's date and time
+        var now = new Date().getTime();
+    
+        // Find the distance between now and the count down date
+        var distance = start_time - now;
+    
+        // Time calculations for days, hours, minutes and seconds
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+        // Display the result in the button element
+        group_member_ready_button.innerHTML = days + "d " + hours + "h "
+        + minutes + "m " + seconds + "s ";
+    
+        // If the count down is finished, start AJAX polling
+        // and set the proper "ready" button text
+        if (distance < 0) {
+            clearInterval(x);
+
+            setInterval(pollGroupMemberReady, 3000);
+
+            group_member_ready_eligible = true;
+            if (GAME_GROUP_IS_USER_READY) {
+                group_member_ready_button.innerHTML = "Neesmu gatavs";
+                group_member_ready_button.classList.add('unready');
+            } else {
+                group_member_ready_button.innerHTML = "Esmu gatavs!";
+            }
+        }
+    }, 1000);
+}
+if (group_member_ready_button) {
+    timeUntilGameStart();
+}
+
+// Function for marking the user as ready to start the game
+function toggleMyReady(current_user_name) {
+    var ready_div = document.querySelector(`div[group_member_name="${current_user_name}"]`);
+    if (group_member_ready_eligible) {
+        $.ajax({
+            url: GAME_GROUP_TOGGLE_USER_READY_URL,
+            method: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    ready_div.classList.toggle('ready');
+                    if (group_member_ready_button.innerHTML == "Esmu gatavs!") {
+                        group_member_ready_button.innerHTML = "Neesmu gatavs";
+                    } else {
+                        group_member_ready_button.innerHTML = "Esmu gatavs!";
+                    }
+                    group_member_ready_button.classList.toggle('unready');
+                }
+            },
+        });
+    }
+}

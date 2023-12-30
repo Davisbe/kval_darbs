@@ -49,15 +49,15 @@
                     @foreach ($game_invites as $game_invite)
                     <div class="notification-row col-section" user_friend_request_name="">
                         <div class="notification-top row-section">
-                            <button id="friend-notification-deny" class="notification-accept" onclick="">
+                            <button id="friend-notification-deny" class="notification-deny" onclick="window.location.href='{{ route('group.deny', ['id' => $game_invite->id]) }}'">
                                 <div>
                                     <x-svg.cross_icon />
                                 </div>
                             </button>
                             <div>
-                                <x-svg.friend_request_icon /><p>no <a href="" class="hyperlink-text"></a></p>
+                                <x-svg.group_invite_icon /><p>no <a href="{{ $game_invite->inviter_profile_link }}" class="hyperlink-text">{{ $game_invite->inviter_name }}</a></p>
                             </div>
-                            <button id="friend-notification-accept" class="notification-deny" onclick="">
+                            <button id="friend-notification-accept" class="notification-accept" onclick="window.location.href='{{ route('group.accept', ['id' => $game_invite->id]) }}'">
                                 <div>
                                     <x-svg.check_icon />
                                 </div>
@@ -73,8 +73,12 @@
             </div>
 
             <div class="flex-container-center pregame-continue-button">
-                <button class="form-submit-button" onclick="getLocation()">
-                    {{ __('Izveidot grupu, pievienoties') }}
+                <button class="form-submit-button" onclick="window.location.href='{{ route('game.group', ['id' => $game->id]) }}'">
+                    @if ($game->isPartOfAGroup)
+                        {{ __('Turpināt') }}
+                    @else
+                        {{ __('Izveidot grupu, pievienoties') }}
+                    @endif
                 </button>
             </div>
         </div>

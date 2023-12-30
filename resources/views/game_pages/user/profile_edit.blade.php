@@ -30,7 +30,7 @@
                 <div>
                     <div class="col-section col-hor-center">
                         <div>
-                            PH
+                            {{ $userinfo->gamesCount }}
                         </div>
                         <div>
                             {{ __('izspēlētas spēles') }}

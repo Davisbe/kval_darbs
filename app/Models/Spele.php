@@ -28,21 +28,30 @@ class Spele extends Model
         return $this->belongsTo(Karte::class)->withTimestamps();
     }
 
-    public function spele():BelongsToMany {
+    public function vieta():BelongsToMany {
         return $this->belongsToMany(Vieta::class, 'spelevieta', 'spele_id', 'vieta_id')->withTimestamps();
     }
 
     public function grupa():HasMany {
-        return $this->hasMany(Grupa::class);
+        return $this->HasMany(Grupa::class);
     }
 
     public function sazina():HasMany {
         return $this->hasMany(Sazina::class);
     }
 
-    // get all games that are not ended, also figure out how many players have joined to each game (i.e. how many players are connected to the groups which are conencted to the game)
-    public static function getAvailableGames() {
-        
+    // check if game has started
+    public function hasStarted() {
+        return $this->start_time < now();
+    }
+
+    // check if game has ended
+    public function hasEnded() {
+        return $this->end_time < now();
+    }
+
+    public function IsTimeBetweenStartAndEnd() {
+        return $this->start_time < now() && $this->end_time > now();
     }
 
 

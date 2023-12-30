@@ -300,7 +300,7 @@ ________________________________________________________________________________
 .form-submit-button {
     text-transform: uppercase;
     margin-bottom: 20px;
-    background-color: #72AE2B;
+    background-color: #6cc778;
     height: 50px;
     border-width: 0;
     border-style: solid;
@@ -808,6 +808,7 @@ ________________________________________________________________________________
     padding: 5px;
     background-color: #DFD8E2;
     border-radius: 5px;
+    transition: background-color 0.25s linear;
 }
 .friend-info {
     display: flex;
@@ -818,19 +819,26 @@ ________________________________________________________________________________
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    transition: width 0.25s linear;
 }
 
 .friend-result-image {
     padding-right: 5px;
+    display: flex;
+    align-items: center;
+    transition: padding 0.25s linear;
 }
 
 .friend-result-image img {
     height: 30px;
     border-radius: 100%;
+    transition: height 0.25s linear;
+    transition: height 0.25s linear;
 }
 
 .friend-result-text {
     overflow: hidden;
+    transition: font-size 0.25s linear;
 }
 
 .remove-friend {
@@ -839,6 +847,7 @@ ________________________________________________________________________________
     color: #2D3047;
     font-weight: 700;
     border-radius: 5px;
+    transition: width 0.25s linear;
 }
 
 /* _______________________________________________________________________________
@@ -1068,7 +1077,8 @@ ________________________________________________________________________________
 }
 
 .game-description {
-    border-top: #2D3047 1px solid;
+    border-bottom: #2d3047ab 1px solid;
+    border-radius: 10px;
     margin-bottom: 20px;
     padding: 10px;
     text-indent: 20px;
@@ -1079,19 +1089,22 @@ ________________________________________________________________________________
 .game-description h1 {
     text-indent: 0;
     text-align: center;
+    color: #2D3047;
     font-size: 20px;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 .game-invites h1 {
     font-size: 20px;
-    font-weight: 300;
+    font-weight: 400;
     text-align: center;
+    color: #2D3047;
     margin-bottom: 10px;
+    margin-top: 20px;
 }
 
 .info-text-small-centered {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 300;
     text-align: center;
     margin-bottom: 10px;
@@ -1099,4 +1112,102 @@ ________________________________________________________________________________
 
 .pregame-continue-button {
     margin-top: 20px;
+}
+
+/* _______________________________________________________________________________
+
+                                VIEW GROUP BEFORE THE GAME
+__________________________________________________________________________________ */
+
+.game-group-member-list {
+    margin-top: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-attachment: fixed;
+    background-size: cover;
+    background: linear-gradient(45deg, rgba(200,198,157,1) 0%, rgba(205,164,164,1) 50%, rgba(166,155,204,1) 100%);
+}
+
+.game-group-member-list .friend-result {
+    border-radius: 0;
+    background-color: transparent;
+}
+
+.game-group-member-list .remove-friend {
+    background-color: #d3a1a2;
+}
+
+.group-member-owner-icon {
+    display: flex;
+    align-items: center;
+    padding-left: 5px;
+}
+
+.group-member-owner-icon svg {
+    height: 8px;
+    width: auto;
+}
+
+.group-member-ready-icon {
+    display: none;
+    align-items: center;
+    padding-left: 5px;
+}
+
+.friend-result.ready .group-member-ready-icon {
+    display: flex;
+}
+
+.group-member-ready-icon svg {
+    height: 18px;
+    width: auto;
+}
+
+.invite-friends-to-group {
+    margin-top: 40px;
+    text-align: center;
+}
+.invite-friends-to-group h1 {
+    color: #2D3047;
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+
+.invite-friends-to-group {
+    gap: 10px;
+}
+
+.invite-friends-to-group .friend-result-image img {
+    height: 24px;
+    width: 24px;
+}
+
+.friend-result.invited-to-group-clicked {
+    background-color: #c8e0cb;
+}
+
+.friend-result.invited-to-group-clicked .friend-result-image {
+    padding: 0;
+}
+
+.friend-result.invited-to-group-clicked .friend-result-image img {
+    height: 0;
+    width: 0;
+}
+
+.friend-result.invited-to-group-clicked .friend-result-text {
+    font-size: 0;
+}
+
+.friend-result.invited-to-group-clicked .friend-actions {
+    width: 100%;
+}
+
+.friend-result.invited-to-group-clicked .remove-friend {
+    width: 100%;
+}
+
+#group-member-ready-button.unready {
+    background-color: #d3a1a2;
 }

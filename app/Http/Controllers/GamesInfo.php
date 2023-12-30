@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Grupa;
 use Illuminate\Http\Request;
 use App\Models\Spele;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -21,7 +21,8 @@ class GamesInfo extends Controller
         $auth_user = User::where('name', Auth::user()->name)
                 ->select(['id', 'name'])
                 ->firstOrFail();
-
+        
+        // get the info about the game
         $game = DB::table('speles')
             ->select('speles.id', 'speles.name', 'speles.description', 'speles.picture', 'speles.start_time', 'speles.end_time',
                 DB::raw('count(lietotajsgrupa.user_id) as player_count'),
@@ -32,15 +33,16 @@ class GamesInfo extends Controller
             ->leftJoin('lietotajsgrupa', 'grupas.id', '=', 'lietotajsgrupa.grupa_id')
             ->where('speles.id', '=', $id)
             ->groupBy('speles.id', 'speles.name', 'speles.description', 'speles.picture', 'speles.start_time', 'speles.end_time')
-            ->get();
+            ->first();
         
-        // ->select('grupas.id', 'inviter.name as inviter_name', 'grupas.created_at')
+        // gets all invites from other users to the game
         $game_invites = $auth_user->groupInvitesToGame($id);
         foreach ($game_invites as $invite) {
             $invite->inviter_profile_link = route('profile.show', ['name' => $invite->inviter_name]);
         }
-        
-        $game = $game[0];
+
+        // check if the user is part of a group in the game
+        $game->isPartOfAGroup = $auth_user->isPartOfAGroup($id);
         
         return view('game_pages/show_game', compact('game', 'game_invites'));
     }
@@ -53,7 +55,7 @@ class GamesInfo extends Controller
             $games = DB::table('speles')
             ->select('speles.id', 'speles.name', 'speles.picture', 'speles.start_time', 'speles.end_time',
                 DB::raw('count(lietotajsgrupa.user_id) as player_count'),
-                DB::raw('count(if (lietotajsgrupa.user_id = '.Auth::user()->id.', 1, NULL)) as joined'))
+                DB::raw('count(if (lietotajsgrupa.user_id = '.Auth::user()->id.' and lietotajsgrupa.apstiprinats = 1, 1, NULL)) as joined'))
             ->leftJoin('grupas', 'speles.id', '=', 'grupas.spele_id')
             ->leftJoin('lietotajsgrupa', 'grupas.id', '=', 'lietotajsgrupa.grupa_id')
             ->where('speles.end_time', '>', now())
@@ -69,12 +71,5 @@ class GamesInfo extends Controller
         }
         
         return response()->json(['success' => true, $games]);
-    }
-
-    public function test(Request $request) {
-        $latitude = $request->input('latitude');
-        $longitude = $request->input('longitude');
-        
-        return response()->json(['success' => true, 'data' => [$latitude, $longitude]]);
     }
 }

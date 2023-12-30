@@ -54,7 +54,7 @@ class UserProfile extends Controller
             $userinfo->google_oauth = true;
         }
 
-
+        $userinfo->gamesCount = $userinfo->gamesHistory()->flatten()->count();
 
         return view('game_pages/user/profile_edit', compact('userinfo'));
     }

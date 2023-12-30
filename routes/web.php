@@ -7,6 +7,8 @@ use App\Http\Controllers\AuthGoogle;
 use App\Http\Controllers\Homepage;
 use App\Http\Controllers\UserProfile;
 use App\Http\Controllers\GamesInfo;
+use App\Http\Controllers\Group;
+use App\Http\Controllers\Game;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 use Illuminate\Support\Facades\Event;
@@ -51,7 +53,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/games', [GamesInfo::class, 'index'])->name('games_index');
     Route::get('/games/loadmore', [GamesInfo::class, 'index_load_games'])->name('games_index.loadmore');
     Route::get('/games/{id}', [GamesInfo::class, 'show'])->name('game.show');
-    Route::post('/games/test', [GamesInfo::class, 'test'])->name('game.test');
+
+    Route::get('/games/{id}/group', [Group::class, 'games_group'])->name('game.group');
+    Route::get('/group/{id}/deny', [Group::class, 'group_deny'])->name('group.deny');
+    Route::get('/group/{id}/accept', [Group::class, 'group_accept'])->name('group.accept');
+    Route::get('/games/{id}/group/leave', [Group::class, 'group_leave'])->name('group.leave');
+    Route::post('/games/{id}/group/kick-user/{name}', [Group::class, 'remove_member'])->name('group.remove_member');
+    Route::post('/games/{id}/group/invite-user/{name}', [Group::class, 'invite_friend'])->name('group.invite_friend');
+    Route::post('/games/{id}/group/toggle-me-ready', [Group::class, 'toggle_user_ready'])->name('group.toggle_user_ready');
+    Route::get('/games/{id}/group/poll-users-ready', [Group::class, 'poll_users_ready'])->name('group.poll-users-ready');
+
+    Route::get('/games/{id}/active', [Game::class, 'index'])->name('active_game.index');
 
     Route::get('/user/{name}', [UserProfile::class, 'show'])->name('profile.show');
     Route::get('/user/{name}/edit', [UserProfile::class, 'edit'])->name('profile.edit');
