@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Karte;
 use App\Models\Spele;
 use App\Models\Grupa;
+use App\Models\Vieta;
+use App\Models\Role;
 use Carbon\Carbon;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -60,9 +62,9 @@ class DatabaseSeeder extends Seeder
 
         $karte = Karte::create([
             'name' => 'Jūrmala',
-            'viduspunkts_garums' => 56.946285,
-            'viduspunkts_platums' => 24.105078,
-            'zoom' => 12,
+            'viduspunkts_garums' => 56.962198,
+            'viduspunkts_platums' => 23.726692,
+            'zoom' => 10,
         ]);
         $karte->save();
 
@@ -101,7 +103,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Jūrmalas brīnišķīgā spēle 4',
             'description' => 'Jūrmalas spēle 4',
             'picture' => 'storage/images/static/profile-pic-placeholder.png',
-            'start_time' => Carbon::parse('2024-06-01 00:00:00'),
+            'start_time' => Carbon::parse('2023-06-01 00:00:00'),
             'end_time' => Carbon::parse('2024-06-31 23:59:59'),
         ]);
         $spele4->save();
@@ -200,43 +202,90 @@ class DatabaseSeeder extends Seeder
             'grupa_id' => $grupa1->id,
             'uzaicinats' => 0,
             'apstiprinats' => 1,
-            'active' => 1,
+            'active' => -1,
         ]);
         $lietotajsgrupa2 = DB::table('lietotajsgrupa')->insert([
             'user_id' => $testing_user->id,
             'grupa_id' => $grupa2->id,
             'uzaicinats' => 0,
             'apstiprinats' => 1,
-            'active' => 1,
+            'active' => -1,
         ]);
         $lietotajsgrupa3 = DB::table('lietotajsgrupa')->insert([
             'user_id' => $testing_user->id,
             'grupa_id' => $grupa3->id,
             'uzaicinats' => 0,
             'apstiprinats' => 1,
-            'active' => 1,
+            'active' => -1,
         ]);
         $lietotajsgrupa4 = DB::table('lietotajsgrupa')->insert([
             'user_id' => $testing_user->id,
             'grupa_id' => $grupa4->id,
             'uzaicinats' => 0,
             'apstiprinats' => 1,
-            'active' => 0,
+            'active' => -1,
         ]);
         $lietotajs2grupa4 = DB::table('lietotajsgrupa')->insert([
             'user_id' => $testing_user2->id,
             'grupa_id' => $grupa4->id,
             'uzaicinats' => 1,
             'apstiprinats' => -1,
-            'active' => 0,
+            'active' => -1,
         ]);
         $lietotajsgrupa5 = DB::table('lietotajsgrupa')->insert([
             'user_id' => $testing_user->id,
             'grupa_id' => $grupa5->id,
             'uzaicinats' => 0,
             'apstiprinats' => 1,
-            'active' => 0,
+            'active' => -1,
         ]);
+
+        $vieta1 = Vieta::create([
+            'name' => 'Vieta1',
+            'garums' => 23.620509,
+            'platums' => 56.941024,
+            'pielaujama_kluda' => 20,
+            'sarezgitiba' => 1,
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
+        ]);
+
+        $vieta1 = Vieta::create([
+            'name' => 'Mana vieta1',
+            'garums' => 23.600982,
+            'platums' => 56.960508,
+            'pielaujama_kluda' => 50,
+            'sarezgitiba' => 2,
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
+        ]);
+
+        $vieta1 = Vieta::create([
+            'name' => 'Market vieta1',
+            'garums' => 23.603053,
+            'platums' => 56.959224,
+            'pielaujama_kluda' => 50,
+            'sarezgitiba' => 3,
+            'picture' => 'storage/images/static/profile-pic-placeholder.png',
+        ]);
+
+        $spele4->vieta()->attach([1, 2, 3]);
+
+        $spele4->karte()->associate($karte);
+
+        $admin_role = Role::create ([
+            'role' => 'admin',
+        ]);
+        $admin_role->save();
+
+        $admin_user = User::create([
+            'name' => 'adminuser',
+            'email' => 'admin@test',
+            'password' => Hash::make('qwerty12345'),
+            'profile_picture' => 'storage/images/static/profile-pic-placeholder.png',
+        ]);
+        $admin_user->markEmailAsVerified();
+        $admin_user->save();
+
+        $admin_user->role()->attach($admin_role->id);
 
     }
 }

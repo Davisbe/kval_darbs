@@ -79,8 +79,10 @@ class UserProfile extends Controller
                 $image_resize = ImageManager::gd()->read($request->file('profile-picture'));
                 $image_resize = $image_resize->coverDown(256, 256)->toJpeg(75)->__toString();
                 if (Storage::put('public/images/profile_pictures/'.$imageName, $image_resize, 'public')) {
-                    if ($user->profile_picture != 'storage/images/static/profile-pic-placeholder.png') {
-                        Storage::delete(str_replace('storage/', 'public/', $user->profile_picture));
+                    if (!is_null($user->profile_picture)) {
+                        if ($user->profile_picture != 'storage/images/static/profile-pic-placeholder.png') {
+                            Storage::delete(str_replace('storage/', 'public/', $user->profile_picture));
+                        }
                     }
                 }
                 else {
@@ -277,6 +279,30 @@ class UserProfile extends Controller
             return response()->json(['success' => false]);
         }
         
+    }
+
+    public function settings_view() {
+        return view('game_pages/user/settings');
+    }
+
+    public function delete_user(Request $request) {
+        $auth_user = User::where('name', Auth::user()->name)
+                ->firstOrFail();
+
+        $request->validate([
+            'confirm_delete' => 'required|boolean',
+        ]);
+
+        if ($request->input('confirm_delete') == false) {
+            return response()->json(['success' => false]);
+        }
+
+        Auth::logout();
+
+        $auth_user->delete();
+
+        return response()->json(['success' => true, 'redirect_link'=>route('login')]);
+
     }
 
 }

@@ -106,11 +106,7 @@ class AuthGoogle extends Controller
         $save = $user->save();
 
         if ($save) {
-            // create role row for user in "roles" table
-            $user_role = Role::create([
-                'user_id' => $user->id
-            ]);
-            $user_role->save();
+
             if (Auth::login($user)) {
                 $request->session()->regenerate();
             }

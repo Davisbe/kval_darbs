@@ -36,6 +36,17 @@ class Grupa extends Model
             ->first();
     }
 
+    // get all active group mambers and their locations in the past 5 minutes
+    public function getActiveGroupMemberLocations() {
+        return $this->user()
+            ->wherePivot('apstiprinats', 1)
+            ->wherePivot('active', 1)
+            ->with('location' , function($query) {
+                $query->where('location.created_at', '>=', now()->subMinutes(5))->limit(2);
+            })
+            ->get(['users.name', 'users.id']);
+    }
+
     public function removeGroupMember($name) {
         $user_to_be_kicked = $this->user()
             ->where('users.name', $name)
@@ -150,17 +161,83 @@ class Grupa extends Model
     }
 
     // Check if all group members are ready to play
+    // !! also returns true if a group member is actively playing !!
     public function isGroupReady() {
         $group_members = $this->user()
             ->wherePivot('apstiprinats', 1)
+            ->withPivot('active')
             ->get();
 
         foreach ($group_members as $group_member) {
+            if ($group_member->pivot->active == 1) {
+                return true;
+            }
             if ($group_member->pivot->active != 0) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    // set member as actively playing
+    public function setMemberActive(string $name) {
+        $user = $this->user()
+            ->where('users.name', $name)
+            ->first();
+
+        $group_user_connection = $this->user()
+            ->wherePivot('apstiprinats', 1)
+            ->wherePivot('user_id', $user->id)
+            ->first();
+        
+        $game = $this->spele()
+        ->first();
+        
+        if (!$game->IsTimeBetweenStartAndEnd()) {
+            return;
+        }
+        
+        if (!$group_user_connection) {
+            return;
+        }
+
+        $group_user_connection->pivot->active = 1;
+        $group_user_connection->pivot->save();
+
+        return;
+    }
+
+    public function getPlacesFoundCount() {
+        $places_found = $this->vieta()
+            ->get();
+
+        return count($places_found);
+    }
+
+    public function getPoints() {
+        $places_found = $this->vieta()
+            ->get();
+
+        $points = 0;
+
+        foreach ($places_found as $place) {
+            $points += $place->sarezgitiba;
+        }
+
+        return $points;
+    }
+
+    // get the places that are still not found by the group
+    public function selectPlacesToFind() {
+        $places_found = $this->vieta()
+            ->pluck('id')->toArray();
+
+        $places_to_find = $this->spele()
+            ->first()
+            ->vieta()
+            ->whereNotIn('id', $places_found);
+
+        return $places_to_find;
     }
 }

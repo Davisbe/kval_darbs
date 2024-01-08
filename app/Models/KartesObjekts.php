@@ -17,6 +17,6 @@ class KartesObjekts extends Model
 
     public function karte()
     {
-        return $this->belongsTo(Karte::class)->withTimestamps();
+        return $this->belongsTo(Karte::class);
     }
 }

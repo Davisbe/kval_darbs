@@ -24,7 +24,7 @@ class Karte extends Model
         return $this->hasMany(KartesObjekts::class);
     }
 
-    public function speles():HasMany {
+    public function spele():HasMany {
         return $this->hasMany(Spele::class);
     }
 

@@ -2,6 +2,25 @@
 @section('title', 'MAUC - rediģēt profilu')
 @section('header_title', $userinfo->name)
 @section('content')
+<div id="confirmation-window" class="confirmation-window">
+    <div id="confirmation-window-content" class="confirmation-window-content col-section">
+        <h2>
+            {{ __('Apstiprināt:') }}
+        </h2>
+        <p id="confirmation-window-text">
+            {{ __('Vai tiešām vēlaties dzēst savu profilu? Profila dzēšana ir neatgriezeniska.') }}
+        </p>
+        <div class="confirm-button-wrapper">
+            <button id="confirmation-button-confirm">
+                Jā
+            </button>
+            <button id="confirmation-button-cancel">
+                Nē
+            </button>
+        </div>
+    </div>
+</div>
+
 <form enctype="multipart/form-data" id="updateProfileForm" accept-charset="utf-8" action="{{ route('profile.update', ['name' => $userinfo->name]) }}" method="post">
 @csrf
     <div class="padding-lr-15 col-section">
@@ -144,7 +163,13 @@
                         {{ __('Saglabāt') }}
                     </button>
                 </div>
+
+                
             </form>
+
+            <div id="delete-profile-button" class="flex-container-center error-msg-label delete-profile-button">
+                    {{ __('Dzēst profilu') }}
+            </div>
         </div>
         </div>
     </div>
@@ -152,5 +177,6 @@
     <script type="text/javascript">
         var MESSAGE_PROFILE_PICTURE_EDIT_PROCESSING = "{{ __('Uzgaidi..') }}";
         var MESSAGE_PROFILE_PICTURE_EDIT_ERROR = "{{ __('Izvēlies citu foto') }}";
+        const DELETE_PROFILE_URL = "{{ route('profile.delete_user') }}";
     </script>
 @endsection

@@ -93,11 +93,7 @@ class Authentification extends Controller
         if ($save) {
             // used to send email verification link
             event(new Registered($user));
-            // create role row for user in "roles" table
-            $user_role = Role::create([
-                'user_id' => $user->id
-            ]);
-            $user_role->save();
+            
             // log in user, so they can verify their email in the same session
             if (Auth::attempt($credentials)) {
                 $request->session()->regenerate();

@@ -17,11 +17,11 @@ class Sazina extends Model
 
     public function spele()
     {
-        return $this->belongsTo(Spele::class)->withTimestamps();
+        return $this->belongsTo(Spele::class);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class)->withTimestamps();
+        return $this->belongsTo(User::class);
     }
 }

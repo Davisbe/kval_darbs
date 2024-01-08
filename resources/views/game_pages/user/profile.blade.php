@@ -95,7 +95,7 @@
                         {{ $game_date }}
                     </div>
                     @foreach ($game_records as $game_record)
-                        <div class="spelu-vesture-ieraksts">
+                        <div class="spelu-vesture-ieraksts" onclick="window.location.href = '{{ route('game.show', ['id' => $game_record->id]) }}'">
                             <div class="speles-ieraksts-bilde" style="background-image: url('{{ asset($game_record->picture) }}')">
                             </div>
                             <div class="speles-ieraksts-nosaukums">

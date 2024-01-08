@@ -15,6 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('grupa_id');
             $table->unsignedBigInteger('vieta_id');
             $table->primary(['grupa_id', 'vieta_id']);
+            $table->text('picture')->nullable();
             $table->timestamps();
             $table->foreign('grupa_id')->references('id')->on('grupas')->cascadeOnDelete();
             $table->foreign('vieta_id')->references('id')->on('vietas')->cascadeOnDelete();

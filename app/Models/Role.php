@@ -4,21 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model
 {
     use HasFactory;
 
     protected $table = 'roles';
-    protected $primaryKey = 'user_id';
-    public $incrementing = false;
     protected $fillable = [
-        'user_id'
+        'role'
     ];
 
-    public function user():BelongsTo
+    public function user():BelongsToMany
     {
-        return $this->belongsTo(User::class)->withTimestamps();
+        return $this->belongsToMany(User::class, 'users_roles', 'role_id', 'user_id')->withTimestamps();
+
     }
 }

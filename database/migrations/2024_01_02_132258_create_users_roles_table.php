@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('location', function (Blueprint $table) {
-            $table->id();
+        Schema::create('users_roles', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
-            $table->decimal('garums', 9, 6);
-            $table->decimal('platums', 8, 6);
+            $table->unsignedBigInteger('role_id');
+            $table->primary(['user_id', 'role_id']);
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->unsignedInteger('precizitate');
+            $table->foreign('role_id')->references('id')->on('roles')->cascadeOnDelete();
         });
     }
 
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loaction');
+        Schema::dropIfExists('users_roles');
     }
 };

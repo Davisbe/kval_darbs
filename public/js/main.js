@@ -11,6 +11,40 @@ function convertUTCDateToLocalDate(date) {
     return newDate;
 }
 
+function convertLocalDateToUTCDate(date) {
+    var date = new Date(date);
+    var newDate = new Date( Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
+                date.getUTCDate(), date.getUTCHours(),
+                date.getUTCMinutes(), date.getUTCSeconds()));
+    return newDate;
+}
+
+function formatLocalDateToYYYYMMDDHHMMSS(date) {
+    const pad = (number) => number.toString().padStart(2, '0');
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1); // getMonth() returns 0-11
+    const day = pad(date.getDate());
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+function formatUTCDateToYYYYMMDDHHMMSS(date) {
+    const pad = (number) => number.toString().padStart(2, '0');
+
+    const year = date.getUTCFullYear();
+    const month = pad(date.getUTCMonth() + 1); // getUTCMonth() returns 0-11
+    const day = pad(date.getUTCDate());
+    const hours = pad(date.getUTCHours());
+    const minutes = pad(date.getUTCMinutes());
+    const seconds = pad(date.getUTCSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 // For converting js Date object to HH:MM format
 function DateToHHMM(date) {
     datetext = date.toTimeString();
@@ -172,8 +206,23 @@ function sendFriendRequest() {
     For removing friends and the confirmation window
 
 */
+var confirm_window = document.getElementById('confirmation-window');
+var confirm_window_content = document.getElementById('confirmation-window-content');
+var confirm_window_cancel_button = document.getElementById('confirmation-button-cancel');
+var confirm_window_confirm_button = document.getElementById('confirmation-button-confirm');
+var confirm_window_friends_listeners = false;
+
 function removeFriendConfirmWindow(name) {
-    var confirm_window = document.getElementById('confirmation-window');
+    if (confirm_window && !confirm_window_friends_listeners) {
+
+        confirm_window_friends_listeners = true;
+
+        confirm_window.addEventListener('click', confirm_window_close);
+        confirm_window_cancel_button.addEventListener('click', confirm_window_close);
+        confirm_window_content.addEventListener('click', confirm_window_content_propogation);
+        confirm_window_confirm_button.addEventListener('click', confirmButtonListenerRemoveFriend);
+    }
+
     confirm_window.classList.toggle('opened');
     confirm_window.setAttribute('friend-name', name);
 
@@ -182,11 +231,8 @@ function removeFriendConfirmWindow(name) {
 }
 
 
-var confirm_window = document.getElementById('confirmation-window');
-var confirm_window_content = document.getElementById('confirmation-window-content');
-var confirm_window_cancel_button = document.getElementById('confirmation-button-cancel');
-var confirm_window_confirm_button = document.getElementById('confirmation-button-confirm');
-var confirmButtonListener = function() {
+
+var confirmButtonListenerRemoveFriend = function() {
     var name = confirm_window.getAttribute('friend-name');
     
     $.ajax({
@@ -195,7 +241,6 @@ var confirmButtonListener = function() {
         url: REMOVE_FRIEND_URL.replace("%24", name),
         method: 'POST',
         success: function(response) {
-            var confirm_window = document.getElementById('confirmation-window');
             confirm_window.classList.remove('opened');
             if (response.success) {
                 var friend_div = document.querySelector(`div[friend-row-name="${name}"]`);
@@ -214,12 +259,7 @@ var confirm_window_close = function() {
     confirm_window.classList.remove('opened');
 };
 
-if (confirm_window) {
-    confirm_window.addEventListener('click', confirm_window_close);
-    confirm_window_cancel_button.addEventListener('click', confirm_window_close);
-    confirm_window_content.addEventListener('click', confirm_window_content_propogation);
-    confirm_window_confirm_button.addEventListener('click', confirmButtonListener);
-}
+
 
 /*
 
@@ -315,6 +355,45 @@ function handleProfilePicture(file) {
     if (pfp_overlay) {
         pfp_overlay.remove();
     }
+}
+
+function confirmButtonListenerDeleteProfile() {
+    $.ajax({
+        url: DELETE_PROFILE_URL,
+        method: 'POST',
+        datatype: 'json',
+        data: {
+            confirm_delete: 1
+        },
+        success: function(response) {
+            if (response.success) {
+                window.location.href = response.redirect_link;
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error(textStatus);
+            console.error(jqXHR.responseText);
+        }
+    });
+}
+
+var delete_profile_button = document.getElementById('delete-profile-button');
+var confirm_window_deleteProfile_listeners = false;
+
+if (delete_profile_button) {
+    delete_profile_button.addEventListener('click', function() {
+        if (confirm_window && !confirm_window_friends_listeners) {
+
+            confirm_window_deleteProfile_listeners = true;
+    
+            confirm_window.addEventListener('click', confirm_window_close);
+            confirm_window_cancel_button.addEventListener('click', confirm_window_close);
+            confirm_window_content.addEventListener('click', confirm_window_content_propogation);
+            confirm_window_confirm_button.addEventListener('click', confirmButtonListenerDeleteProfile);
+        }
+        confirm_window.classList.toggle('opened');
+    });
+
 }
 
 /*
@@ -458,35 +537,6 @@ if (game_show_end_time) {
     game_show_end_time.textContent = end_time;
 }
 
-//test
-// function getLocation() {
-//     if (navigator.geolocation) {
-//         navigator.geolocation.getCurrentPosition(sendLocation);
-//     } else {
-//         alert("Geolocation is not supported by this browser.");
-//     }
-// }
-  
-// function sendLocation(position) {
-    // var latitude = position.coords.latitude;
-    // var longitude = position.coords.longitude;
-    // console.log(latitude+', '+longitude);
-
-    // $.ajax({
-    //     url: "https://mauclocal.lv/games/test",
-    //     type: "POST",
-    //     data: {
-    //     latitude: latitude,
-    //     longitude: longitude,
-    //     },
-    //     success: function (response) {
-    //         console.log(response);
-    //     },
-    //     error: function (response) {
-    //         alert("Error: " + response.responseText);
-    //     },
-    // });
-// }
 
 /*
 
@@ -710,4 +760,537 @@ function toggleMyReady(current_user_name) {
             },
         });
     }
+}
+
+
+/*
+
+    ACTIVE GAME PAGE AND MAP
+    Ajax polling for group info, js for the map
+
+*/
+
+var active_game_map = document.getElementById('active_game_map');
+
+if (active_game_map) {
+
+    var map = L.map('active_game_map', { pmIgnore: true }).setView([
+        ACTIVE_GAME_MAP_INFO.viduspunkts_platums,
+        ACTIVE_GAME_MAP_INFO.viduspunkts_garums],
+        ACTIVE_GAME_MAP_INFO.zoom);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // add new layers
+    var fg = L.featureGroup().addTo(map);
+
+    // check if there actually are any layers to add
+    if (typeof ACTIVE_GAME_MAP_INFO.kartesobjekts !== 'undefined') {
+
+        ACTIVE_GAME_MAP_INFO.kartesobjekts.forEach(objekts => {
+            let object_geojson = JSON.parse(objekts.geojson);
+            object_geojson.features.forEach(feature => {
+                var new_layer_feature = L.geoJSON(feature);
+    
+                // make sure to set color for the feature if it exists
+                if(feature.properties.color) {
+                    new_layer_feature.setStyle({color: feature.properties.color});
+                }
+    
+                new_layer_feature.addTo(fg);
+            });
+        });
+
+        // add new markers to the map
+        // from ACTIVE_GAME_MAP_PLACES
+        ACTIVE_GAME_MAP_PLACES.forEach(place => {
+
+            L.marker([place.platums, place.garums]).addTo(map);
+            L.circle([place.platums, place.garums], {
+                radius: 310,
+                opacity: 0.3,
+                fillOpacity: 0.3
+            }).addTo(map);
+        });
+
+    }
+
+}
+
+let places_listed_divs = document.querySelectorAll('.active-game-place');
+
+var place_view_window = document.getElementById('place-view-window');
+var place_view_window_content = document.getElementById('place-view-window-content');
+var place_view_window_close_button = document.getElementById('place-view-window-close-button');
+var place_view_window_submit_button = document.getElementById('place-view-window-submit-button');
+// Used for sending AJAX request to server
+// and viewing a place and it's picture:
+var selected_place_id = null;
+// In case user views other place while tryFoundPlace()
+// AJAX request is still processing:
+var selected_place_id_forSubmit = null;
+// Used to check if user location is already
+// being read:
+var geoNavId = null;
+
+if (places_listed_divs) {
+    places_listed_divs.forEach(div => {
+        div.addEventListener('click', function() {
+            var place_id = this.getAttribute('div_place_id');
+            var place = ACTIVE_GAME_PLACE_LIST.find(place => place.id == place_id);
+            place_view_window.classList.add('opened');
+
+            var image_div = document.getElementById('place-view-image-tag');
+            image_div.src = place.picture;
+            selected_place_id = place_id;
+
+            place_view_window_submit_button.addEventListener('click', placeViewSubmitListener, true)
+
+        });
+    });
+}
+
+
+function placeViewSubmitListener(e) {    
+    e.preventDefault();
+
+    selected_place_id_forSubmit = selected_place_id;
+    if (navigator.geolocation) {
+        let loading_precise_loacation = document.getElementById('loading_precise_loacation');
+        if (loading_precise_loacation) {
+            loading_precise_loacation.classList.add('visible');
+        }
+        window.navigator.geolocation.clearWatch(geoNavId);
+        geoNavId = navigator.geolocation.watchPosition(tryFoundPlace,
+            navigationErrorMsg,
+            {maximumAge:2000, timeout:5000, enableHighAccuracy: true});
+    } else {
+        alert("Ierīcei jāatbalsta GPS lokācijas dalīšanos!");
+    }
+
+};
+
+function navigationErrorMsg(err) {
+    if (err.code == 1) {
+        alert("Nepieciešams atļaut piekļuvi atrašanās vietai!");
+    } else if(err.code == 2) {
+        alert("Nevar piekļūt lokācijai!");
+    } else {
+        alert("Nezināma kļūda, pārlādē lapu!");
+    }
+}
+
+function tryFoundPlace(position) {
+
+    var latitude = position.coords.latitude;
+    var longitude = position.coords.longitude;
+    var precision = position.coords.accuracy;
+
+    if (position.coords.accuracy > 20) {
+        return;
+    } else {
+        window.navigator.geolocation.clearWatch(geoNavId);
+        let loading_precise_loacation = document.getElementById('loading_precise_loacation');
+        if (loading_precise_loacation) {
+            loading_precise_loacation.classList.remove('visible');
+        }
+        $.ajax({
+            url: ACTIVE_GAME_PLACE_TRY_URL,
+            data: {
+                place_id: selected_place_id,
+                latitude: latitude,
+                longitude: longitude,
+                precision: precision
+            },
+            method: 'POST',
+            datatype: 'json',
+            success: function(response) {
+                if (response.success) {
+                    if (!response.is_leader) {
+                        if (response.place_close) {
+                            alert("Tu esi tuvu vietai! Tagad 5 minūšu laikā pārējiem grupas dalībniekiem ir jānospiež poga.");
+                        }
+                        else {
+                            alert("Tu neesi tuvu šai vietai!");
+                        }
+                    }
+                    else {
+                        if (response.group_members_far.length == 0) {
+                            selectPictureAndSubmitPlace();
+                        } else {
+                            users_far_wrapper = document.getElementById('users_far_wrapper');
+                            users_far_wrapper.classList.add('visible');
+
+                            users_far_list = document.getElementById('users_far_list');
+                            users_far_list.innerHTML = '';
+                            var new_html = ``;
+
+                            response.group_members_far.forEach(member => {
+                                new_html += `
+                                <div class="users_far_user">
+                                    ${member}
+                                </div>
+                                `;
+                            });
+
+                            users_far_list.innerHTML = new_html;
+                        }
+                        
+                    }
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error(textStatus);
+                console.error(jqXHR.responseText);
+            }
+        });
+    }
+    
+}
+
+function selectPictureAndSubmitPlace() {
+    place_found_picture_input = document.getElementById('place-found-picture-input');
+    place_found_picture_input.click();
+
+    place_found_picture_input.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            place_found_id = document.getElementById('place-found-id');
+            place_found_id.value = selected_place_id_forSubmit;
+            
+            submit_place_form = document.getElementById('submit_place_form');
+            submit_place_form.submit();
+        }
+    });
+}
+
+var place_view_window_content_propogation = function(e) {
+    e.stopPropagation();
+    users_far_wrapper = document.getElementById('users_far_wrapper');
+    if (users_far_wrapper) {
+        users_far_wrapper.classList.remove('visible');
+    }
+    
+};
+
+var place_view_window_close = function() {
+    place_view_window.classList.remove('opened');
+
+    users_far_wrapper = document.getElementById('users_far_wrapper');
+    if (users_far_wrapper) {
+        users_far_wrapper.classList.remove('visible');
+    }
+};
+
+if (place_view_window) {
+    place_view_window.addEventListener('click', place_view_window_close);
+    place_view_window_close_button.addEventListener('click', place_view_window_close);
+    place_view_window_content.addEventListener('click', place_view_window_content_propogation);
+}
+
+/*
+
+    ADMIN DASHBOARD
+    Mostly visual stuff
+
+*/
+
+/* for creating a new game */
+
+var game_edit_map = document.getElementById('map_edit');
+
+if (game_edit_map) {
+
+    var map = L.map("map_edit").setView([57.000456, 24.263306], 8);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    map.pm.addControls({
+        position: 'topleft',
+        drawCircle: false,
+        drawMarker: false,
+    });
+
+    // handle colors of new polygons
+    // and store them in properties of the polygon
+    // geojson
+    map.on('pm:create', function(event) {
+        var layer = event.layer,
+            feature = layer.feature = layer.feature || {};
+        
+        feature.type = feature.type || "Feature"; // Init the fature type
+
+        feature.properties = {}; // Initialize the properties
+        feature.properties.color = ''; // Set the color property
+
+        if(layer instanceof L.Polygon || layer instanceof L.Circle) {
+            layer.on('click', function() { // When the layer is clicked
+                var selectedColor = document.getElementById('mapColorSelection').value; // Get the selected color
+                layer.setStyle({color: selectedColor}); // Apply the selected color to the polygon
+
+                layer.feature.properties.color = selectedColor;
+            });
+        }
+    });
+
+}
+
+// handle admin dashboard switching between sections
+// when creating a new game
+function createGameSectionSwitch(sectionId) {
+
+    var sections = document.querySelectorAll('.c_game_sec');
+    var buttons = document.querySelectorAll('.admin-selection-button');
+
+    sections.forEach(element => {
+        if(element.id !== sectionId) element.classList.remove('selected')
+    });
+
+    var button_id = 'button_'.concat(sectionId);
+    buttons.forEach(element => {
+        if(element.id !== (button_id)) element.classList.remove('selected')
+    });
+
+    var x = document.getElementById(sectionId);
+    if (!x.classList.contains('selected')) {
+        x.classList.add('selected');
+        // if map section, invalidate map size
+        // so map tiles load corectly
+        if (sectionId == 'c_game_sec2') {
+            map.invalidateSize();
+        }
+    }
+
+    var y = document.getElementById(button_id);
+    if (!y.classList.contains('selected')) {
+        y.classList.add('selected');
+    }
+}
+
+const existingMapSelection = document.getElementById('existingMapSelection');
+
+if (existingMapSelection) {
+    // Add an event listener for when the selection changes
+    existingMapSelection.addEventListener('change', function() {
+        ADMIN_MAPS_INFO.forEach(map_info => {
+            if (map_info.id == this.value) {
+                var fg = L.featureGroup().addTo(map);
+                // add new layers
+                map_info.kartesobjekts.forEach(objekts => {
+                    let object_geojson = JSON.parse(objekts.geojson);
+                    object_geojson.features.forEach(feature => {
+                        var new_layer_feature = L.geoJSON(feature);
+
+                        // make sure to set color for the feature if it exists
+                        if(feature.properties.color) {
+                            new_layer_feature.setStyle({color: feature.properties.color});
+                        }
+
+                        new_layer_feature.addTo(fg);
+                    });
+                });
+            }
+        });
+  });
+}
+
+var admin_set_map_inputs_current = document.getElementById("set_map_inputs_current");
+if (admin_set_map_inputs_current) {  
+    admin_set_map_inputs_current.onclick = setMapInputsCurrent;
+}
+
+// set current user's map zoom and center to the inputs
+function setMapInputsCurrent() {
+    zoom = map.getZoom();
+    center = map.getCenter();
+
+    map_zoom_input = document.getElementById("map_zoom");
+    map_center_lat_input = document.getElementById("map_latitude");
+    map_center_lng_input = document.getElementById("map_longitude");
+
+    map_zoom_input.value = zoom;
+    map_center_lat_input.value = center.lat.toFixed(6);
+    map_center_lng_input.value = center.lng.toFixed(6);
+}
+
+var admin_new_game_button_submit = document.getElementById("admin_new_game_button_submit");
+if (admin_new_game_button_submit) {  
+    admin_new_game_button_submit.addEventListener('click', handleGameCreteUpdate, true);
+}
+
+var admin_update_game_button_submit = document.getElementById("admin_update_game_button_submit");
+if (admin_update_game_button_submit) {  
+    admin_update_game_button_submit.addEventListener('click', handleGameCreteUpdate, true);
+
+    // convert UTC dates to local dates
+    let game_start_time_initial_input = document.getElementById("game_start");
+    let new_game_start_time = convertUTCDateToLocalDate(game_start_time_initial_input.value);
+    game_start_time_initial_input.value = formatLocalDateToYYYYMMDDHHMMSS(new_game_start_time);
+
+    let game_end_time_initial_input = document.getElementById("game_end");
+    let new_game_end_time = convertUTCDateToLocalDate(game_end_time_initial_input.value);
+    game_end_time_initial_input.value = formatLocalDateToYYYYMMDDHHMMSS(new_game_end_time);
+}
+
+// handle new game creation - add geojson if new map created
+function handleGameCreteUpdate(e) {
+    e.preventDefault();
+    
+    let selectElement = document.getElementById("existingMapSelection");
+    let selectedOption = selectElement.options[selectElement.selectedIndex];
+    let selectedValue = selectedOption.value;
+
+    var map_geojson = [];
+
+    // if admin selected to create a new map, set the geojson to be sent
+    if (isNaN(selectedValue)) {
+        var map_geojson = L.featureGroup();
+        map.eachLayer((layer)=>{
+            // check if layer is not a marker and was created with the geoman plugin
+            if(layer instanceof L.Path && layer.pm){
+                map_geojson.addLayer(layer);
+            }
+        });
+        map_geojson = (map_geojson.toGeoJSON());
+
+        if (map_geojson.features.length == 0) {
+            alert("Karte nevar būt tukša!");
+            return;
+        }
+
+        map_geojson = JSON.stringify(map_geojson);
+
+        let new_map_geojson_input = document.getElementById("new_map_geojson_input");
+        new_map_geojson_input.value = map_geojson;
+    }
+
+    var game_start_time_input = document.getElementById("game_start");
+    if (game_start_time_input.value != "") {
+        var game_start_time = convertLocalDateToUTCDate(game_start_time_input.value);
+        game_start_time_input.value = formatUTCDateToYYYYMMDDHHMMSS(game_start_time);
+    }
+
+    var game_end_time_input = document.getElementById("game_end");
+    if (game_end_time_input.value != "") {
+        var game_end_time = convertLocalDateToUTCDate(game_end_time_input.value);
+        game_end_time_input.value = formatUTCDateToYYYYMMDDHHMMSS(game_end_time);
+    }
+
+    $("#admin_save_new_game").submit();
+    
+}
+
+
+/* for creating/editing a new findable place */
+
+var game_place_map = document.getElementById('map_view_new_place');
+
+if (game_place_map) {
+
+    var map = L.map("map_view_new_place").setView([57.000456, 24.263306], 8);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    map.pm.addControls({
+        position: 'topleft',
+        drawCircle: false,
+        drawPolygon: false,
+        drawCircleMarker: false,
+        drawMarker: true,
+        drawPolyline: false,
+        cutPolygon: false,
+        drawText: false,
+        drawRectangle: false,
+        editMode: false,
+        removalMode: false,
+        rotateMode: false,
+    });
+
+    var exising_marker;
+
+    if (typeof ADMIN_EXISING_PLACE_COORDS !== 'undefined') {
+        exising_marker = L.marker([ADMIN_EXISING_PLACE_COORDS.lat, ADMIN_EXISING_PLACE_COORDS.lng]).addTo(map);
+        exising_marker.on('pm:dragend', function(e) {
+            updateNewPlaceCoords(exising_marker.getLatLng());
+        });
+    }
+
+    map.on('pm:create', function (e) {
+        var layer = e.layer
+        if(layer instanceof L.Marker){
+            if (typeof exising_marker !== 'undefined') {
+                map.removeLayer(exising_marker);
+            }
+            exising_marker = layer;
+            updateNewPlaceCoords(exising_marker.getLatLng());
+            exising_marker.on('pm:dragend', function(e) {
+                updateNewPlaceCoords(exising_marker.getLatLng());
+            });
+        }
+    });
+
+    var admin_place_longitude_input = document.getElementById("admin_place_longitude");
+    var admin_place_latitude_input = document.getElementById("admin_place_latitude");
+
+    admin_place_longitude_input.addEventListener('change', function() {
+        if (typeof exising_marker !== 'undefined') {
+            exising_marker.setLatLng([exising_marker.getLatLng().lat ,admin_place_longitude_input.value]);
+        }
+        else {
+            exising_marker = L.marker([map.getCenter().lat, admin_place_longitude_input.value]).addTo(map);
+            exising_marker.on('pm:dragend', function(e) {
+                updateNewPlaceCoords(exising_marker.getLatLng());
+            });
+        }
+    });
+
+    admin_place_latitude_input.addEventListener('change', function() {
+        if (typeof exising_marker !== 'undefined') {
+            exising_marker.setLatLng([admin_place_latitude_input.value, exising_marker.getLatLng().lng]);
+        }
+        else {
+            exising_marker = L.marker([admin_place_latitude_input.value, map.getCenter().lng]).addTo(map);
+            exising_marker.on('pm:dragend', function(e) {
+                updateNewPlaceCoords(exising_marker.getLatLng());
+            });
+        }
+    });
+
+}
+
+function updateNewPlaceCoords(coords) {
+    admin_place_latitude_input.value = coords.lat.toFixed(6);
+    admin_place_longitude_input.value = coords.lng.toFixed(6);
+}
+
+/* for suspending/unsuspending users using the buttons in
+    the admin dashboard */
+var admin_suspend_user_buttons = document.querySelectorAll('.user_suspend_toggle_button');
+
+if (admin_suspend_user_buttons) {
+    admin_suspend_user_buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            var user_name = this.getAttribute('user_name');
+            $.ajax({
+                url: ADMIN_USER_SUSPEND_URL,
+                method: 'POST',
+                data: {
+                    user_name: user_name
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    }
+                },
+            });
+        });
+    });
 }

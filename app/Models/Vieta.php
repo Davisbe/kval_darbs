@@ -24,9 +24,9 @@ class Vieta extends Model
         return $this->belongsToMany(Grupa::class, 'atrastavieta', 'vieta_id', 'grupa_id')->withTimestamps();
     }
 
-    public function spelevieta():BelongsToMany
+    public function spele():BelongsToMany
     {
-        return $this->belongsToMany(SpeleVieta::class, 'spelevieta', 'vieta_id', 'spele_id')->withTimestamps();
+        return $this->belongsToMany(Spele::class, 'spelevieta', 'vieta_id', 'spele_id')->withTimestamps();
     }
 
 }

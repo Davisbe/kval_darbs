@@ -14,10 +14,18 @@ use Exception;
 class Group extends Controller
 {
     public function games_group($game_id) {
+        $game_info = Spele::select('id', 'name', 'picture', 'start_time', 'end_time')
+            ->findOrFail($game_id);
+
+        // Prevent users joining new groups if game has ended
+        if ($game_info->end_time < now()) {
+            return redirect()->route('game.show', ['id' => $game_id]);
+        }
+
         $auth_user = User::where('name', Auth::user()->name)
                 ->select(['id', 'name'])
                 ->firstOrFail();
-
+        
         if (!$auth_user->isPartOfAGroup($game_id)) {
             $auth_user->createGroupInGame($game_id);
         }
@@ -29,10 +37,15 @@ class Group extends Controller
         
         $group = Grupa::where('id', $group_user_connection->id)
             ->firstOrFail();
+        
+        if ($group->isGroupReady()) {
+            $group->setMemberActive($auth_user->name);
+            return redirect()->route('active_game.index', ['id' => $game_id]);
+        }
 
         $group_members = $auth_user->getMyGroupMembersFromGame($game_id);
 
-        // could just use getGroupLeader method, but idk group_id and it's
+        // could just use getGroupLeader method, but it's
         // going to be another SELECT query then
         $group_leader = [];
 
@@ -51,11 +64,6 @@ class Group extends Controller
             $friend->profile_picture = asset($friend->profile_picture);
             $friend->profile_link = route('profile.show', ['name' => $friend->name]);
         }
-
-        $game_info = DB::table('speles')
-            ->select('speles.id', 'speles.name', 'speles.picture', 'speles.start_time')
-            ->where('speles.id', '=', $game_id)
-            ->first();
 
         return view('game_pages/games_group', compact('is_user_ready', 'group_members', 'game_info', 'group_leader', 'friendlist_invitable'));
     }
@@ -80,6 +88,14 @@ class Group extends Controller
             ->firstOrFail()
             ->spele_id;
         
+        $game = Spele::where('id', $game_id)
+        ->firstOrFail();
+        
+        // Prevent users joining new groups if game has ended
+        if ($game->end_time < now()) {
+            return redirect()->route('game.show', ['id' => $game_id]);
+        }
+        
         // leave group if already in one
         $auth_user->leaveGroupFromGame($game_id);
 
@@ -89,6 +105,14 @@ class Group extends Controller
     }
 
     public function group_leave($game_id) {
+        $game = Spele::where('id', $game_id)
+            ->firstOrFail();
+        
+        // Prevent users leaving their group if game has ended
+        if ($game->end_time < now()) {
+            return redirect()->route('game.show', ['id' => $game_id]);
+        }
+
         $auth_user = User::where('name', Auth::user()->name)
                 ->select(['id', 'name'])
                 ->firstOrFail();
@@ -99,6 +123,14 @@ class Group extends Controller
     }
 
     public function remove_member($game_id, $name) {
+        $game = Spele::where('id', $game_id)
+            ->firstOrFail();
+        
+        // Prevent users kicking eachother if game has ended
+        if ($game->end_time < now()) {
+            return redirect()->route('game.show', ['id' => $game_id]);
+        }
+
         $auth_user = User::where('name', Auth::user()->name)
                 ->select(['id', 'name'])
                 ->firstOrFail();
@@ -123,6 +155,14 @@ class Group extends Controller
 
 
     public function invite_friend($game_id, $name) {
+        $game = Spele::where('id', $game_id)
+            ->firstOrFail();
+        
+        // Prevent users inviting other users if game has ended
+        if ($game->end_time < now()) {
+            return redirect()->route('game.show', ['id' => $game_id]);
+        }
+
         $auth_user = User::where('name', Auth::user()->name)
                 ->select(['id', 'name'])
                 ->firstOrFail();
@@ -156,6 +196,10 @@ class Group extends Controller
             ->firstOrFail();
         
         if (!$group->isMemberReady($auth_user->name)) {
+            // set member to not ready so 2 active games
+            // are not possible for a user
+            $auth_user->setNotReadyForAllGroups();
+
             $group->setMemberReady($auth_user->name);
         } else {
             $group->setMemberNotReady($auth_user->name);
@@ -185,7 +229,8 @@ class Group extends Controller
         }
 
         if ($group->isGroupReady()) {
-            $redirect_link_allready = route('active_game.index', ['id' => $game_id]);
+            $redirect_link_allready = route('active_game.index');
+            $group->setMemberActive($auth_user->name);
             return response()->json(['success' => false, 'redirect_link_allready'=>$redirect_link_allready]);
         }
         

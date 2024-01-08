@@ -8,12 +8,20 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
         <link rel="stylesheet" type="text/css" href="{{ asset('/css/style_game_pages.css') }}">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
     </head>
     <body>
         <header class="padding-lr-15">
             <nav>
                 <div class="row-lmr-1">
-                    <div>
+                    <div onclick="window.location.href='{{ route('active_game.index') }}'">
+                        <x-svg.back_arrow_icon />
                     </div>
                 </div>
                 <div class="row-lmr-2">
@@ -22,10 +30,8 @@
                     </div>
                 </div>
                 <div class="row-lmr-3">
-                    <div>
-                        <button onclick='window.location.href="{{ route('notifications') }}"'>
-                            <x-svg.notification_icon />
-                        </button>
+                    <div onclick="window.location.href='{{ route('active_game.chat_view') }}'">
+                        <x-svg.chat_icon />
                     </div>
                 </div>
             </nav>
@@ -42,8 +48,8 @@
                 </div>
                 <div class="row-lmr-2">
                     <div>
-                        <button onclick="window.location.href='{{ route('games_index') }}'">
-                            <x-svg.games_list_icon />
+                        <button onclick="window.location.href='{{ route('active_game.places_list') }}'">
+                            <x-svg.meklejama_vieta_big_icon />
                         </button>
                     </div>
                 </div>
@@ -67,6 +73,7 @@
                 <div>© Dāvis Safronovs 2023</div>
             </footer>
         </div>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script language="JavaScript" type="text/javascript" src="{{ url('/js/main.js') }}"></script>
     </body>

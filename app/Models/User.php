@@ -55,9 +55,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-    public function role():HasOne
+    public function role():BelongsToMany
     {
-        return $this->hasOne(Role::class);
+        return $this->belongsToMany(Role::class, 'users_roles', 'user_id', 'role_id')->withTimestamps();
     }
 
     public function location():HasMany {
@@ -161,9 +161,9 @@ class User extends Authenticatable implements MustVerifyEmail
             ->join('grupas', 'speles.id', '=', 'grupas.spele_id')
             ->join('lietotajsgrupa', 'grupas.id', '=', 'lietotajsgrupa.grupa_id')
             ->where('lietotajsgrupa.user_id', $this->id)
-            ->where('lietotajsgrupa.active', 2)
+            ->where('lietotajsgrupa.active', 1)
             ->where('speles.end_time', '<', now())
-            ->select('speles.name', 'speles.start_time', 'speles.picture')
+            ->select('speles.id', 'speles.name', 'speles.start_time', 'speles.picture')
             ->orderBy('speles.start_time', 'desc')
             ->get()
             ->groupBy(function ($val) {
@@ -398,6 +398,43 @@ class User extends Authenticatable implements MustVerifyEmail
 
     }
 
+    // check if user is active in a game
+    // returns game id if user is active in a game, 0 otherwise
+    public function checkIfPlayingGame() {
+        $active_games = Spele::where('start_time', '<', now())
+            ->where('end_time', '>', now())
+            ->pluck('id')
+            ->toArray();
+        
+        $user_active_games = $this->grupa()
+            ->whereIn('spele_id', $active_games)
+            ->wherePivot('active', 1)
+            ->first();
+
+        if ($user_active_games) {
+            return $user_active_games->spele_id;
+        } else {
+            return 0;
+        }
+
+    }
+
+    public function isAdmin() {
+        return $this->role()->where('role', 'admin')->exists();
+    }
+
+    // set user as not ready for any group in any game
+    // if user actually marked as ready in some group
+    public function setNotReadyForAllGroups() {
+        $this->grupa()->updateExistingPivot(null, ['active' => -1]);
+    }
+
+    public function getTwoRecentLocations() {
+        return $this->location()
+            ->where('created_at', '>=', now()->subMinutes(5))
+            ->limit(2)
+            ->get();
+    }
 
 
 }
